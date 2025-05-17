@@ -328,7 +328,12 @@ public class SwingGameView extends JFrame implements GameView {
             boolean isLeftHalf = x < boardWidth / 2;
             
             // Calculate point index within quadrant
-            int quadrantX = isLeftHalf ? x : x - boardWidth / 2 - 30; // Adjust for the bar
+            int quadrantX;
+            if (isLeftHalf) {
+                quadrantX = x - pointWidth; // Adjust for the shifted left side points
+            } else {
+                quadrantX = x - boardWidth / 2 - 30; // Adjust for the bar
+            }
             int pointInQuadrant = quadrantX / pointWidth;
             
             // Apply bounds checking
@@ -412,11 +417,11 @@ public class SwingGameView extends JFrame implements GameView {
                     y = height - pointHeight;
                 } else if (i < 12) {
                     // Points 7-12 (bottom left)
-                    x = width / 2 - 15 - (i - 6) * pointWidth;
+                    x = width / 2 - 15 - pointWidth - (i - 6) * pointWidth;
                     y = height - pointHeight;
                 } else if (i < 18) {
                     // Points 13-18 (top left)
-                    x = width / 2 - 15 - (i - 12) * pointWidth;
+                    x = width / 2 - 15 - pointWidth - (i - 12) * pointWidth;
                     y = 0;
                 } else {
                     // Points 19-24 (top right)
@@ -433,14 +438,14 @@ public class SwingGameView extends JFrame implements GameView {
                     g2d.setColor(isEven ? LIGHT_POINT_COLOR : DARK_POINT_COLOR);
                 }
                 
-                // Draw the triangle - FIXED: corrected orientation
+                // Draw the triangle with correct orientation
                 int[] xPoints = {x, x + pointWidth, x + pointWidth / 2};
                 int[] yPoints;
                 if (isTopHalf) {
-                    // Top half - triangles point DOWN (corrected)
+                    // Top half - triangles point DOWN
                     yPoints = new int[]{y, y, y + pointHeight};
                 } else {
-                    // Bottom half - triangles point UP (corrected)
+                    // Bottom half - triangles point UP
                     yPoints = new int[]{y + pointHeight, y + pointHeight, y};
                 }
                 

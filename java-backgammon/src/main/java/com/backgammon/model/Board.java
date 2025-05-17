@@ -51,16 +51,16 @@ public class Board {
      */
     private void setupInitialPosition() {
         // White checkers
-        addCheckers(0, PlayerColor.WHITE, 2);   // Point 1: 2 white checkers
+        addCheckers(0, PlayerColor.BLACK, 2);   // Point 1: 2 black checkers (fixed)
         addCheckers(5, PlayerColor.WHITE, 5);   // Point 6: 5 white checkers
         addCheckers(7, PlayerColor.WHITE, 3);   // Point 8: 3 white checkers
-        addCheckers(11, PlayerColor.WHITE, 5);  // Point 12: 5 white checkers
+        addCheckers(11, PlayerColor.BLACK, 5);  // Point 12: 5 black checkers (fixed)
         
         // Black checkers 
-        addCheckers(12, PlayerColor.BLACK, 5);  // Point 13: 5 black checkers
+        addCheckers(12, PlayerColor.WHITE, 5);  // Point 13: 5 white checkers (fixed)
         addCheckers(16, PlayerColor.BLACK, 3);  // Point 17: 3 black checkers
         addCheckers(18, PlayerColor.BLACK, 5);  // Point 19: 5 black checkers
-        addCheckers(23, PlayerColor.BLACK, 2);  // Point 24: 2 black checkers
+        addCheckers(23, PlayerColor.WHITE, 2);  // Point 24: 2 white checkers (fixed)
     }
     
     /**
