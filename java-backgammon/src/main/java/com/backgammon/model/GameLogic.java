@@ -202,74 +202,7 @@ public class GameLogic {
         currentPlayer = currentPlayer.opposite();
     }
     
-    /**
-     * Undo the last move
-     * @return true if a move was undone, false if there are no moves to undo
-     */
-    public boolean undoLastMove() {
-        if (movesPlayed.isEmpty()) {
-            return false;
-        }
-        
-        // Get the last move
-        Move lastMove = movesPlayed.remove(movesPlayed.size() - 1);
-        
-        // Restore the die value
-        int dieValue = calculateDieValue(lastMove.getFrom(), lastMove.getTo());
-        for (int i = 0; i < dice.getValues().size(); i++) {
-            if (dice.getValues().get(i) == dieValue && dice.getUsed().get(i)) {
-                // Un-use this die
-                dice.getUsed().set(i, false);
-                break;
-            }
-        }
-        
-        // Undo the move on the board
-        int from = lastMove.getFrom();
-        int to = lastMove.getTo();
-        
-        // This is a simplified undo that doesn't handle all scenarios perfectly,
-        // especially with hits. A real implementation would need to track the full
-        // move history to handle complex cases.
-        
-        if (from == Board.WHITE_BAR) {
-            // White coming in from the bar - put back on bar
-            Point destPoint = board.getPoint(to);
-            destPoint.removeChecker();
-            board.addToBar(PlayerColor.WHITE);
-        } else if (from == Board.BLACK_BAR) {
-            // Black coming in from the bar - put back on bar
-            Point destPoint = board.getPoint(to);
-            destPoint.removeChecker();
-            board.addToBar(PlayerColor.BLACK);
-        } else if (to == Board.WHITE_HOME) {
-            // White bearing off - put back on point
-            board.getPoint(from).addChecker(PlayerColor.WHITE);
-            // Remove from home
-            if (board.getHomeCount(PlayerColor.WHITE) > 0) {
-                board.home.put(PlayerColor.WHITE, board.getHomeCount(PlayerColor.WHITE) - 1);
-            }
-        } else if (to == Board.BLACK_HOME) {
-            // Black bearing off - put back on point
-            board.getPoint(from).addChecker(PlayerColor.BLACK);
-            // Remove from home
-            if (board.getHomeCount(PlayerColor.BLACK) > 0) {
-                board.home.put(PlayerColor.BLACK, board.getHomeCount(PlayerColor.BLACK) - 1);
-            }
-        } else {
-            // Regular move
-            Point fromPoint = board.getPoint(from);
-            Point toPoint = board.getPoint(to);
-            
-            // Remove from destination
-            PlayerColor color = toPoint.removeChecker();
-            
-            // Add back to source
-            fromPoint.addChecker(color);
-        }
-        
-        return true;
-    }
+    // Undo functionality has been removed
     
     /**
      * Check if the game is over

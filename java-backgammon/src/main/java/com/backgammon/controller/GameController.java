@@ -234,23 +234,7 @@ public class GameController {
         updateView();
     }
     
-    /**
-     * Undo the last move
-     */
-    public void undoLastMove() {
-        if (gameLogic.getGameState() != GameState.PLAYING) {
-            return;
-        }
-        
-        // If it's AI's turn and AI mode is enabled, ignore
-        if (aiMode && gameLogic.getCurrentPlayer() == PlayerColor.BLACK) {
-            return;
-        }
-        
-        gameLogic.undoLastMove();
-        selectedPoint = null;
-        updateView();
-    }
+    // Undo functionality has been removed
     
     /**
      * Update the view with current game state

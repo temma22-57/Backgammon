@@ -48,7 +48,6 @@ public class SwingGameView extends JFrame implements GameView {
     private JLabel statusLabel;
     private JButton rollButton;
     private JButton endTurnButton;
-    private JButton undoButton;
     private JPanel dicePanel;
     
     // Game state
@@ -335,31 +334,36 @@ public class SwingGameView extends JFrame implements GameView {
             boolean isLeftHalf = x < boardWidth / 2;
             
             // Calculate point index within quadrant
-            int quadrantX = isLeftHalf ? x : x - boardWidth / 2;
+            int quadrantX = isLeftHalf ? x : x - boardWidth / 2 - 30; // Adjust for the bar
             int pointInQuadrant = quadrantX / pointWidth;
-            if (pointInQuadrant >= 6) {
-                pointInQuadrant = 5; // Cap at 5 (6 points per quadrant)
-            }
             
-            // Convert to global point index
+            // Apply bounds checking
+            if (pointInQuadrant < 0) pointInQuadrant = 0;
+            if (pointInQuadrant >= 6) pointInQuadrant = 5; // Cap at 5 (6 points per quadrant)
+            
+            // UPDATED: Convert to global point index based on our corrected point layout
             int pointIndex;
             if (isTopHalf) {
                 if (isLeftHalf) {
                     // Top left quadrant (points 13-18)
-                    pointIndex = 12 - pointInQuadrant;
+                    pointIndex = 12 + pointInQuadrant;
                 } else {
                     // Top right quadrant (points 19-24)
-                    pointIndex = 6 - pointInQuadrant - 1;
+                    pointIndex = 18 + pointInQuadrant;
                 }
             } else {
                 if (isLeftHalf) {
                     // Bottom left quadrant (points 7-12)
-                    pointIndex = 6 + pointInQuadrant;
+                    pointIndex = 11 - pointInQuadrant;
                 } else {
                     // Bottom right quadrant (points 1-6)
-                    pointIndex = 18 + pointInQuadrant;
+                    pointIndex = 5 - pointInQuadrant;
                 }
             }
+            
+            // Ensure index is valid
+            if (pointIndex < 0) pointIndex = 0;
+            if (pointIndex > 23) pointIndex = 23;
             
             return pointIndex;
         }
@@ -414,11 +418,11 @@ public class SwingGameView extends JFrame implements GameView {
                     y = height - pointHeight;
                 } else if (i < 12) {
                     // Points 7-12 (bottom left)
-                    x = width / 2 - 15 - (i - 5) * pointWidth;
+                    x = width / 2 - 15 - (i - 6) * pointWidth;
                     y = height - pointHeight;
                 } else if (i < 18) {
                     // Points 13-18 (top left)
-                    x = width / 2 - 15 - (17 - i) * pointWidth;
+                    x = width / 2 - 15 - (i - 12) * pointWidth;
                     y = 0;
                 } else {
                     // Points 19-24 (top right)
@@ -435,23 +439,43 @@ public class SwingGameView extends JFrame implements GameView {
                     g2d.setColor(isEven ? LIGHT_POINT_COLOR : DARK_POINT_COLOR);
                 }
                 
-                // Draw the triangle
+                // Draw the triangle - FIXED: corrected orientation
                 int[] xPoints = {x, x + pointWidth, x + pointWidth / 2};
                 int[] yPoints;
                 if (isTopHalf) {
+                    // Top half - triangles point DOWN (corrected)
                     yPoints = new int[]{y, y, y + pointHeight};
                 } else {
+                    // Bottom half - triangles point UP (corrected)
                     yPoints = new int[]{y + pointHeight, y + pointHeight, y};
                 }
                 
                 g2d.fillPolygon(xPoints, yPoints, 3);
                 
-                // Draw the point number
+                // Draw valid move indicator (hollow circle) if this is a valid move
+                if (validMoves.contains(i)) {
+                    g2d.setColor(Color.WHITE);
+                    g2d.setStroke(new BasicStroke(2));
+                    int circleX = x + pointWidth / 2 - 15;
+                    int circleY = isTopHalf ? y + pointHeight / 2 - 15 : y + pointHeight / 2 - 15;
+                    g2d.drawOval(circleX, circleY, 30, 30);
+                }
+                
+                // Draw the point number with better visibility
                 g2d.setColor(Color.WHITE);
-                g2d.setFont(new Font("Arial", Font.PLAIN, 10));
+                g2d.setFont(new Font("Arial", Font.BOLD, 12));
                 String pointNumber = String.valueOf(i + 1);
                 int textX = x + pointWidth / 2 - g2d.getFontMetrics().stringWidth(pointNumber) / 2;
                 int textY = isTopHalf ? y + pointHeight + 15 : y - 5;
+                
+                // Add a dark background behind the text for better readability
+                FontMetrics fm = g2d.getFontMetrics();
+                int textWidth = fm.stringWidth(pointNumber);
+                int textHeight = fm.getHeight();
+                g2d.setColor(new Color(0, 0, 0, 128)); // Semi-transparent black
+                g2d.fillRect(textX - 2, textY - textHeight + 4, textWidth + 4, textHeight);
+                
+                g2d.setColor(Color.WHITE);
                 g2d.drawString(pointNumber, textX, textY);
             }
         }
@@ -568,22 +592,51 @@ public class SwingGameView extends JFrame implements GameView {
             for (int i = 0; i < numToRender; i++) {
                 int offsetY = isTopHalf ? i * checkerHeight : -i * checkerHeight;
                 
-                // Draw the checker
+                // UPDATED: Draw the checker as a full circle
                 g2d.setColor(color == PlayerColor.WHITE ? WHITE_CHECKER_COLOR : BLACK_CHECKER_COLOR);
+                
+                // Fill the circle
                 g2d.fillOval(x - checkerSize / 2, y + offsetY - checkerSize / 2, checkerSize, checkerSize);
                 
-                // Draw a border
+                // Add a 3D effect with a gradient
+                if (color == PlayerColor.WHITE) {
+                    // For white checkers
+                    g2d.setPaint(new GradientPaint(
+                        x - checkerSize / 2, y + offsetY - checkerSize / 2,
+                        new Color(255, 255, 255),
+                        x + checkerSize / 2, y + offsetY + checkerSize / 2,
+                        new Color(220, 220, 220)
+                    ));
+                } else {
+                    // For black checkers
+                    g2d.setPaint(new GradientPaint(
+                        x - checkerSize / 2, y + offsetY - checkerSize / 2,
+                        new Color(50, 50, 50),
+                        x + checkerSize / 2, y + offsetY + checkerSize / 2,
+                        new Color(10, 10, 10)
+                    ));
+                }
+                
+                g2d.fillOval(x - checkerSize / 2, y + offsetY - checkerSize / 2, checkerSize, checkerSize);
+                
+                // Draw a border for better definition
                 g2d.setColor(color == PlayerColor.WHITE ? Color.LIGHT_GRAY : Color.BLACK);
+                g2d.setStroke(new BasicStroke(1.5f));
                 g2d.drawOval(x - checkerSize / 2, y + offsetY - checkerSize / 2, checkerSize, checkerSize);
             }
             
             // If there are more checkers than the stack limit, show a count
             if (count > stackLimit) {
+                // Add a contrasting background for the count text
+                g2d.setColor(new Color(0, 0, 0, 150));
+                g2d.fillOval(x - 15, y - 12, 30, 24);
+                
+                // Draw the count
                 g2d.setColor(Color.WHITE);
-                g2d.setFont(new Font("Arial", Font.BOLD, 12));
+                g2d.setFont(new Font("Arial", Font.BOLD, 14));
                 String countText = String.valueOf(count);
                 int textWidth = g2d.getFontMetrics().stringWidth(countText);
-                g2d.drawString(countText, x - textWidth / 2, y);
+                g2d.drawString(countText, x - textWidth / 2, y + 5);
             }
         }
     }
