@@ -37,7 +37,6 @@ The project is organized following the Model-View-Controller (MVC) design patter
 - Dice rolling with doubles support
 - Checker movement including hitting opponent's blots
 - Bar and bearing off functionality
-- Undo move functionality
 - Comprehensive game state tracking
 
 ## How to Play
@@ -48,7 +47,6 @@ The project is organized following the Model-View-Controller (MVC) design patter
 4. Valid destination points will be highlighted
 5. Click on a highlighted point to move a checker there
 6. Use the "End Turn" button when you've made all possible moves
-7. Use the "Undo Move" button if you want to take back a move
 
 ## Game Rules
 

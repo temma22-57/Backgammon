@@ -111,10 +111,6 @@ public class SwingGameView extends JFrame implements GameView {
         endTurnButton.addActionListener(e -> controller.endTurn());
         buttonPanel.add(endTurnButton);
         
-        undoButton = new JButton("Undo Move");
-        undoButton.addActionListener(e -> controller.undoLastMove());
-        buttonPanel.add(undoButton);
-        
         JButton newGameButton = new JButton("New Game");
         newGameButton.addActionListener(e -> showNewGameDialog());
         buttonPanel.add(newGameButton);
@@ -192,11 +188,9 @@ public class SwingGameView extends JFrame implements GameView {
             boolean hasRolled = !diceValues.isEmpty();
             rollButton.setEnabled(!hasRolled);
             endTurnButton.setEnabled(hasRolled);
-            undoButton.setEnabled(hasRolled);
         } else {
             rollButton.setEnabled(false);
             endTurnButton.setEnabled(false);
-            undoButton.setEnabled(false);
         }
     }
     
